@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  pibaque:
+    image: ghcr.io/TU_USUARIO/ci-cd-examen-pibaque/pibaque:1.0.5
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+
+        # RUTEO HTTP → redirige a HTTPS
+        - "traefik.http.routers.pibaque.entrypoints=http"
+        - "traefik.http.routers.pibaque.rule=Host(`pibaque.byronrm.com`)"
+        - "traefik.http.middlewares.pibaque-https-redirect.redirectscheme.scheme=https"
+        - "traefik.http.routers.pibaque.middlewares=pibaque-https-redirect"
+
+        # RUTEO HTTPS
+        - "traefik.http.routers.pibaque-secure.entrypoints=https"
+        - "traefik.http.routers.pibaque-secure.rule=Host(`pibaque.byronrm.com`)"
+        - "traefik.http.routers.pibaque-secure.tls=true"
+        - "traefik.http.routers.pibaque-secure.tls.certresolver=http"
+
+        # Servicio interno apuntando al puerto de Flask
+        - "traefik.http.routers.pibaque-secure.service=pibaque"
+        - "traefik.http.services.pibaque.loadbalancer.server.port=1001"
+
+        # La red de Traefik
+        - "traefik.docker.network=traefik-public"
+
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true

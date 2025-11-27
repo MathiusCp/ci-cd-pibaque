@@ -1,0 +1,107 @@
+name: CI/CD Pipeline - Flask Pibaque 🚀
+
+on:
+  push:
+    branches:
+      - pibaque    # 📌 Rama del examen
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write  # permite push a GHCR
+      id-token: write
+
+    steps:
+    - name: 🧾 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: 📦 Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install flake8 pytest
+
+    - name: 🧹 Run lint (flake8)
+      run: |
+        echo "Running flake8..."
+        flake8 . || echo "Lint warnings found but continuing ✅"
+
+    - name: 🧪 Run tests
+      run: |
+        pytest -q
+
+    - name: 🔐 Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 🏗️ Build and push Docker image (v1.0.5)
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        tags: ghcr.io/mathiuscp/ci-cd-examen-pibaque/pibaque:1.0.5
+
+    - name: 🧾 Mostrar variables básicas (solo visibles)
+      run: |
+        echo "Host VPS: ${{ secrets.VPS_HOST }}"
+        echo "Usuario VPS: ${{ secrets.VPS_USER }}"
+        echo "Puerto SSH: ${{ secrets.VPS_SSH_PORT }}"
+
+    - name: 🧪 Probar conexión SSH al VPS
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: ${{ secrets.VPS_SSH_PORT }}
+        script: |
+          echo "✅ Conexión exitosa desde GitHub Actions"
+          hostname
+          whoami
+          uptime
+
+    - name: 📤 Copiar stack.yml al VPS
+      uses: appleboy/scp-action@v1
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: ${{ secrets.VPS_SSH_PORT }}
+        source: "stack.yml"
+        target: "/home/${{ secrets.VPS_USER }}/deploy"
+
+    - name: 🚀 Despliegue automático en el VPS
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        port: ${{ secrets.VPS_SSH_PORT }}
+        script: |
+          echo "🔐 Login en GHCR"
+          echo "${{ secrets.GHCR_PATH }}" | docker login ghcr.io -u mathiuscp --password-stdin
+
+          echo "📥 Descargar nueva imagen"
+          docker pull ghcr.io/mathiuscp/ci-cd-examen-pibaque/pibaque:1.0.5
+
+          echo "🛑 Deteniendo stack anterior"
+          docker stack rm pibaque || true
+
+          echo "⏳ Esperando..."
+          sleep 20
+
+          echo "🚀 Desplegando stack nuevo"
+          cd ~/deploy
+          docker stack deploy --with-registry-auth -c stack.yml pibaque
+
+          echo "📌 Contenedores corriendo:"
+          docker ps
