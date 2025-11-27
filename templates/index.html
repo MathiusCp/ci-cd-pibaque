@@ -1,0 +1,37 @@
+<!-- templates/index.html -->
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Ahorcado - Flask</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Ahorcado</h1>
+
+    {% if status == "won" %}
+      <div class="message success">¡Felicidades! Ganaste. La palabra era: <strong>{{ word }}</strong></div>
+      <a href="{{ url_for('new_game') }}" class="btn">Nueva partida</a>
+    {% elif status == "lost" %}
+      <div class="message danger">Perdiste. La palabra era: <strong>{{ word }}</strong></div>
+      <a href="{{ url_for('new_game') }}" class="btn">Intentar de nuevo</a>
+    {% else %}
+      <p>Palabra: <span class="masked">{{ masked }}</span></p>
+      <p>Errores: {{ errors }} / {{ max_errors }}</p>
+
+      <form action="{{ url_for('guess') }}" method="post" class="guess-form">
+        <label for="letter">Ingresa una letra:</label>
+        <input id="letter" name="letter" maxlength="1" autocomplete="off" required pattern="[A-Za-z]">
+        <button type="submit">Adivinar</button>
+      </form>
+
+      <p>Letras adivinadas: {% if guessed %}{{ guessed|join(", ") }}{% else %}—{% endif %}</p>
+      <p><a href="{{ url_for('new_game') }}">Reiniciar partida</a></p>
+    {% endif %}
+
+    <hr>
+    <p class="note">Puedes usar el endpoint <code>/api/state</code> para obtener el estado en JSON.</p>
+  </div>
+</body>
+</html>
