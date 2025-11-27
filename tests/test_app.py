@@ -1,11 +1,13 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from app import app
 
 def test_home():
     tester = app.test_client()
     response = tester.get("/")
     assert response.status_code == 200
-    # Comparar como texto
-    assert "Aplicacion Flask funcionando correctamente" in response.get_data(as_text=True)
+    assert "Aplicación Flask funcionando correctamente" in response.get_data(as_text=True)
 
 def test_ia():
     tester = app.test_client()
