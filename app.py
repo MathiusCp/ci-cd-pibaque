@@ -9,7 +9,7 @@ def home():
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Página Premium</title>
+    <title>Página Premium total</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Google Fonts -->
