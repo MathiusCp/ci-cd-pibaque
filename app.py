@@ -99,4 +99,4 @@ def api_state():
 
 if __name__ == "__main__":
     # puerto 8000 para coincidir con otros ejemplos si quieres
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=1001, debug=True)
