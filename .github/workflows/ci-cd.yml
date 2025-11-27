@@ -73,7 +73,7 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }}
         port: ${{ secrets.VPS_SSH_PORT }}
         source: "stack.yml"
-        target: "/home/${{ secrets.VPS_USER }}/deploy"
+        target: "/home/${{ secrets.VPS_USER }}/pibaque"
 
     - name: 🚀 Despliegue automático en el VPS
       uses: appleboy/ssh-action@v1

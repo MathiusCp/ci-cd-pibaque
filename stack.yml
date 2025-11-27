@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   pibaque:
-    image: ghcr.io/TU_USUARIO/ci-cd-examen-pibaque/pibaque:1.0.5
+    image: ghcr.io/mathiuscp/ci-cd-examen-pibaque/pibaque:1.0.5
     deploy:
       replicas: 1
       labels:

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   app:
-    image: ghcr.io/TU_USUARIO/ci-cd-examen-pibaque/pibaque:1.0.5
+    image: ghcr.io/mathiuscp/ci-cd-examen-pibaque/pibaque:1.0.5
     container_name: app_pibaque
     restart: always
     ports:
