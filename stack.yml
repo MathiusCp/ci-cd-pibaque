@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   pibaque:
-    image: docker pull ghcr.io/mathiuscp/ci-cd-examen-pibaque/pibaque:1.0.5
+    image: ghcr.io/mathiuscp/ci-cd-examen-pibaque/pibaque:1.0.5
     build: .
     deploy:
       replicas: 1
@@ -17,7 +17,7 @@ services:
         - "traefik.http.routers.pibaque-secure.tls=true"
         - "traefik.http.routers.pibaque-secure.tls.certresolver=http"
         - "traefik.http.routers.pibaque-secure.service=pibaque"
-        - "traefik.http.services.pibaque.loadbalancer.server.port=1001"
+        - "traefik.http.services.pibaque.loadbalancer.server.port=1234"
         - "traefik.docker.network=traefik-public"
     networks:
       - traefik-public

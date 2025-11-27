@@ -1,102 +1,127 @@
-# app.py
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-import random
-import string
+from flask import Flask
 
 app = Flask(__name__)
-app.secret_key = "cambia_esta_clave_por_una_segura"  # cámbiala en producción
 
-WORDS = [
-    "python", "flask", "programacion", "desarrollo", "computadora",
-    "algoritmo", "variable", "funcion", "internet", "despliegue",
-    "servidor", "docker", "contener", "repositorio", "git"
-]
+@app.route('/')
+def home():
+    return """
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Página Premium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-MAX_ERRORS = 6
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-def start_new_game():
-    word = random.choice(WORDS).lower()
-    session["word"] = word
-    session["guessed"] = []           # letras adivinadas
-    session["errors"] = 0             # errores cometidos
-    session["status"] = "playing"     # playing, won, lost
+    <style>
+        body {
+            margin: 0;
+            font-family: "Poppins", sans-serif;
+            background: #0e0e0e;
+            color: white;
+        }
 
-def masked_word():
-    word = session.get("word", "")
-    guessed = session.get("guessed", [])
-    return " ".join([c if c in guessed else "_" for c in word])
+        header {
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            padding: 80px 20px;
+            text-align: center;
+            color: white;
+            animation: fadeIn 1.2s ease-in-out;
+        }
 
-def check_game_over():
-    word = session.get("word", "")
-    guessed = session.get("guessed", [])
-    errors = session.get("errors", 0)
-    if all(c in guessed for c in word):
-        session["status"] = "won"
-    elif errors >= MAX_ERRORS:
-        session["status"] = "lost"
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-@app.route("/")
-def index():
-    # Si no hay juego activo, inicia uno
-    if "word" not in session:
-        start_new_game()
-    return render_template(
-        "index.html",
-        masked=masked_word(),
-        errors=session.get("errors", 0),
-        max_errors=MAX_ERRORS,
-        guessed=session.get("guessed", []),
-        status=session.get("status", "playing"),
-        word=session.get("word") if session.get("status") != "playing" else None
-    )
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
 
-@app.route("/new")
-def new_game():
-    start_new_game()
-    return redirect(url_for("index"))
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
 
-@app.route("/guess", methods=["POST"])
-def guess():
-    if "word" not in session:
-        start_new_game()
+        p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
 
-    if session.get("status") != "playing":
-        return redirect(url_for("index"))
+        .section {
+            padding: 40px 20px;
+            max-width: 900px;
+            margin: auto;
+            text-align: center;
+            animation: fadeSection 1.2s ease-in-out;
+        }
 
-    letter = request.form.get("letter", "").strip().lower()
-    if not letter or len(letter) != 1 or letter not in string.ascii_lowercase:
-        # invalid input: ignore and redirect
-        return redirect(url_for("index"))
+        @keyframes fadeSection {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    guessed = session.get("guessed", [])
-    if letter in guessed:
-        return redirect(url_for("index"))  # ya adivinada
+        .card {
+            background: #1a1a1a;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
 
-    guessed.append(letter)
-    session["guessed"] = guessed
+        a.btn {
+            display:inline-block;
+            margin-top: 20px;
+            padding: 14px 26px;
+            background: #8f94fb;
+            color: white;
+            border-radius: 30px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+        }
 
-    if letter not in session.get("word", ""):
-        session["errors"] = session.get("errors", 0) + 1
+        a.btn:hover {
+            background: #4e54c8;
+        }
 
-    check_game_over()
-    return redirect(url_for("index"))
+        footer {
+            margin-top: 60px;
+            padding: 20px;
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
 
-# API endpoint opcional (devuelve estado en JSON)
-@app.route("/api/state")
-def api_state():
-    if "word" not in session:
-        start_new_game()
+<body>
 
-    check_game_over()
-    return jsonify({
-        "masked": masked_word(),
-        "errors": session.get("errors", 0),
-        "max_errors": MAX_ERRORS,
-        "guessed": session.get("guessed", []),
-        "status": session.get("status", "playing"),
-        "word": session.get("word") if session.get("status") != "playing" else None
-    })
+<header>
+    <h1>Página Premium</h1>
+    <p>Diseño moderno totalmente dentro del return</p>
+</header>
 
-if __name__ == "__main__":
-    # puerto 8000 para coincidir con otros ejemplos si quieres
-    app.run(host="0.0.0.0", port=1001, debug=True)
+<div class="section">
+    <div class="card">
+        <h2>Hola 👋</h2>
+        <p>Un servidor me trajo aquí… pero ahora sí da gusto quedarse 😎</p>
+        <a href="/" class="btn">Botón de prueba</a>
+    </div>
+</div>
+
+<footer>
+    © 2025 pgmoreno.byronrm.com – powered by Flask ✨
+</footer>
+
+</body>
+</html>
+"""
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=1001)

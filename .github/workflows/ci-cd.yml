@@ -97,7 +97,7 @@ jobs:
           sleep 20
 
           echo "Desplegando el stack o los servicios"
-          docker stack deploy --with-registry-auth -c stack.yml pibaque
+          docker stack deploy --with-registry-auth -c stack.yml pibauque
 
           docker ps
       
