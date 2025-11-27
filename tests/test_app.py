@@ -5,7 +5,7 @@ def test_home():
     response = tester.get("/")
     assert response.status_code == 200
     # Comparar como texto
-    assert "Aplicación Flask funcionando correctamente" in response.get_data(as_text=True)
+    assert "Aplicacion Flask funcionando correctamente" in response.get_data(as_text=True)
 
 def test_ia():
     tester = app.test_client()
